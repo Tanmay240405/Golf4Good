@@ -147,7 +147,7 @@ export default function Navbar() {
                       </Link>
                       {user?.role === 'ADMIN' && (
                         <Link
-                          to="/dashboard/admin"
+                          to="/admin/dashboard"
                           onClick={() => setProfileOpen(false)}
                           className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5 rounded-lg transition-colors"
                         >
@@ -238,7 +238,7 @@ export default function Navbar() {
                       Winnings
                     </Link>
                     {user?.role === 'ADMIN' && (
-                      <Link to="/dashboard/admin" className="block py-2 text-sm text-text-secondary hover:text-text-primary">
+                      <Link to="/admin/dashboard" className="block py-2 text-sm text-text-secondary hover:text-text-primary">
                         Admin Panel
                       </Link>
                     )}

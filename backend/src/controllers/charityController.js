@@ -114,3 +114,30 @@ export const selectCharity = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateCharity = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const charity = await prisma.charity.update({
+      where: { id },
+      data: updateData
+    });
+    
+    res.json({ success: true, data: charity });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteCharity = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await prisma.charity.delete({ where: { id } });
+    res.json({ success: true, message: 'Charity deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+

@@ -34,8 +34,11 @@ import charityRoutes from './routes/charityRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import drawRoutes from './routes/drawRoutes.js';
 
+import adminRoutes from './routes/adminRoutes.js';
+
 // ─── Routes ─────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/scores', scoreRoutes);
 app.use('/api/charities', charityRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
