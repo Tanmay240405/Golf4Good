@@ -1,0 +1,250 @@
+@import "tailwindcss";
+@source "../src";
+
+/* ========================================
+   Golf4Good Design System
+   Premium dark SaaS — Stripe/Linear style
+   ======================================== */
+
+@theme {
+  --color-bg-primary: #050A0F;
+  --color-bg-secondary: #0A1118;
+  --color-bg-tertiary: #111A24;
+  --color-bg-elevated: #16212C;
+
+  --color-accent: #a3e635; /* Neon/Lime green */
+  --color-accent-hover: #84cc16;
+  --color-accent-light: #bef264;
+  --color-accent-glow: rgba(163, 230, 53, 0.25);
+  --color-accent-glow-strong: rgba(163, 230, 53, 0.5);
+
+  --color-gold: #FBBF24;
+  --color-gold-hover: #f59e0b;
+  --color-gold-light: #fcd34d;
+  --color-gold-glow: rgba(251, 191, 36, 0.15);
+
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-tertiary: #6b7280;
+  --color-text-muted: #4b5563;
+
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+  --color-border-accent: rgba(20, 184, 166, 0.3);
+
+  --color-error: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ========================================
+   Base Styles
+   ======================================== */
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-bg-primary);
+    background-image: url('/golf_course_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-text-tertiary);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+@layer components {
+  /* ========================================
+     Glass Card
+     ======================================== */
+
+  .glass-card {
+    background: rgba(10, 15, 20, 0.75);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    border-color: rgba(163, 230, 53, 0.4);
+    box-shadow: 0 0 40px var(--color-accent-glow), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-card-static {
+    background: rgba(10, 15, 20, 0.75);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+  }
+
+  /* ========================================
+     Gradient Text
+     ======================================== */
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent), var(--color-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-white {
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ========================================
+     Animated Background Orbs
+     ======================================== */
+
+  .orb {
+    display: none;
+  }
+
+  .orb-teal {
+    display: none;
+  }
+
+  .orb-gold {
+    display: none;
+  }
+
+  .orb-blue {
+    display: none;
+  }
+
+  .animate-float {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float 12s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float 10s ease-in-out 2s infinite;
+  }
+
+  /* ========================================
+     Grid Pattern Overlay
+     ======================================== */
+
+  .grid-pattern {
+    display: none;
+  }
+
+  /* ========================================
+     Button Styles
+     ======================================== */
+
+  .btn-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-gold), var(--color-accent));
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .btn-glow:hover::before {
+    opacity: 1;
+  }
+
+  /* ========================================
+     Section Divider
+     ======================================== */
+
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-border-hover), transparent);
+  }
+
+  /* ========================================
+     Focus styles
+     ======================================== */
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* ========================================
+     Responsive Container
+     ======================================== */
+
+  .container-custom {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  @media (min-width: 768px) {
+    .container-custom {
+      padding: 0 40px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-custom {
+      padding: 0 48px;
+    }
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}

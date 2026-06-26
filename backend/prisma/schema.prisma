@@ -1,0 +1,111 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String        @id @default(cuid())
+  name               String
+  email              String        @unique
+  password           String
+  avatar             String?
+  resetToken         String?
+  resetTokenExp      DateTime?
+  selectedCharityId  String?
+  donationPercentage Int           @default(10)
+  role               String        @default("USER") // USER, ADMIN
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  scores             Score[]
+  subscriptions      Subscription[]
+  drawWinners        DrawWinner[]
+  selectedCharity    Charity?      @relation(fields: [selectedCharityId], references: [id], onDelete: SetNull)
+
+  @@map("users")
+}
+
+model Score {
+  id        String   @id @default(cuid())
+  score     Int
+  course    String   @default("Home Course")
+  entries   Int      @default(0)
+  date      DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@map("scores")
+}
+
+model Charity {
+  id             String   @id @default(cuid())
+  name           String
+  description    String   @db.Text
+  logo           String?
+  coverImage     String?
+  website        String?
+  upcomingEvents String?  @db.Text // Store JSON string or simple text for now
+  donationTotal  Float    @default(0.0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  users          User[]
+
+  @@map("charities")
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                 String   // e.g., 'MONTHLY', 'YEARLY'
+  status               String   @default("INACTIVE") // ACTIVE, INACTIVE, CANCELLED, EXPIRED
+  startDate            DateTime?
+  endDate              DateTime?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+model Draw {
+  id              String       @id @default(cuid())
+  title           String       @default("Monthly Draw")
+  date            DateTime     @default(now())
+  winningNumbers  Int[]
+  totalPrizePool  Float        @default(1000.0)
+  status          String       @default("UPCOMING") // UPCOMING, COMPLETED
+  winners         DrawWinner[]
+  createdAt       DateTime     @default(now())
+
+  @@map("draws")
+}
+
+model DrawWinner {
+  id              String   @id @default(cuid())
+  drawId          String
+  draw            Draw     @relation(fields: [drawId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matchType       Int      // 3, 4, or 5
+  prizeAmount     Float
+  status          String   @default("PENDING") // PENDING, APPROVED, PAID, REJECTED
+  proofImage      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("draw_winners")
+}
