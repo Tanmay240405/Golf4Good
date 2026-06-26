@@ -29,6 +29,12 @@ export default function GolfPathOverlay() {
   const pathData = `M ${waypoints[0].x} ${waypoints[0].y} ` + 
     waypoints.slice(1).map(wp => `L ${wp.x} ${wp.y}`).join(' ');
 
+  // Solid path data connecting waypoints up to the current active stage
+  const activePathData = activeStage > 0
+    ? `M ${waypoints[0].x} ${waypoints[0].y} ` + 
+      waypoints.slice(1, activeStage + 1).map(wp => `L ${wp.x} ${wp.y}`).join(' ')
+    : '';
+
   return (
     <div 
       ref={containerRef} 
@@ -41,7 +47,7 @@ export default function GolfPathOverlay() {
         preserveAspectRatio="xMidYMid slice"
         className="w-full h-full opacity-80"
       >
-        {/* Straight lines connecting all 5 waypoints */}
+        {/* Straight lines connecting all 5 waypoints (Base Dashed) */}
         <path
           d={pathData}
           fill="none"
@@ -49,6 +55,16 @@ export default function GolfPathOverlay() {
           strokeWidth="4"
           strokeDasharray="10, 15"
         />
+
+        {/* Solid green Progress Path up to the active stage */}
+        {activeStage > 0 && (
+          <path
+            d={activePathData}
+            fill="none"
+            stroke="var(--color-accent)"
+            strokeWidth="5"
+          />
+        )}
 
         {waypoints.map((wp, index) => {
           const isActive = activeStage === index;
