@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, DollarSign, Trophy, Award, Activity } from 'lucide-react';
+import { Users, DollarSign, Trophy, Award, Activity, Flag, ShieldCheck } from 'lucide-react';
 import adminService from '../../services/adminService';
 import toast from 'react-hot-toast';
 
@@ -16,7 +16,11 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
+    // Artificial delay to show the "Entering Admin Mode" animation
+    const timer = setTimeout(() => {
+      fetchStats();
+    }, 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchStats = async () => {
@@ -60,8 +64,40 @@ export default function AdminDashboard() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-bg-primary/95 backdrop-blur-xl">
+           <motion.div
+              animate={{ 
+                rotate: [0, 5, -5, 0],
+                y: [0, -10, 0]
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="relative mb-6"
+           >
+             <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full scale-150" />
+             <Flag className="w-24 h-24 text-accent relative z-10" />
+           </motion.div>
+           
+           <div className="flex flex-col items-center">
+             <motion.div 
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ delay: 0.3 }}
+               className="flex items-center gap-2 text-white text-2xl font-bold tracking-[0.2em] uppercase mb-4"
+             >
+               <ShieldCheck className="w-7 h-7 text-gold" />
+               Entering Admin Mode
+             </motion.div>
+             <div className="flex gap-2">
+               {[0, 1, 2].map(i => (
+                 <motion.div
+                   key={i}
+                   animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.2, 0.8] }}
+                   transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+                   className="w-3 h-3 rounded-full bg-accent shadow-[0_0_10px_rgba(163,230,53,0.5)]"
+                 />
+               ))}
+             </div>
+           </div>
         </div>
       ) : (
         <>

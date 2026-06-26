@@ -24,11 +24,13 @@ export default function AdminDashboardLayout() {
     <div className="flex min-h-screen bg-bg-primary font-sans text-text-primary overflow-hidden">
       <AdminSidebar />
       <main className="flex-1 overflow-y-auto custom-scrollbar relative">
-        {/* Ambient Background for Admin Panel */}
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-[-10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-accent/5 blur-[120px]" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-[50vw] h-[50vw] rounded-full bg-gold/5 blur-[150px]" />
-        </div>
+        {/* Golf Background with Overlay to match theme */}
+        <div 
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none" 
+          style={{ backgroundImage: 'url(/golf_course_bg.png)' }}
+        />
+        {/* Exact matching Gradient Overlay from main dashboard */}
+        <div className="fixed inset-0 z-0 bg-gradient-to-r from-[rgba(5,10,15,0.95)] via-[rgba(5,10,15,0.7)] to-transparent pointer-events-none" />
         
         <div className="relative z-10 p-6 md:p-10 min-h-full">
           <Outlet />
