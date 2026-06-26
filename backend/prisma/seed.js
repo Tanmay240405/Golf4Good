@@ -40,6 +40,44 @@ const charitiesData = [
   }
 ];
 
+const testimonialsData = [
+  {
+    name: 'Sarah Mitchell',
+    role: 'Amateur Golfer, New York',
+    content: "Golf4Good completely changed how I think about my weekend rounds. I'm not just playing for myself anymore — I'm playing for my local food bank. The monthly competitions keep me motivated, and the community is incredible.",
+    rating: 5,
+    avatar: 'SM',
+  },
+  {
+    name: 'James Richardson',
+    role: 'Club Captain, Austin Golf Club',
+    content: "We enrolled our entire club on the Enterprise plan. The team dashboard and custom tournaments have transformed our member engagement. Plus, we've raised over $15,000 for local charities in just six months.",
+    rating: 5,
+    avatar: 'JR',
+  },
+  {
+    name: 'Emily Chen',
+    role: 'Pro Golfer & Charity Advocate',
+    content: "As someone who's always looked for ways to combine golf with giving back, this platform is a dream. The analytics are top-notch, and the charitable impact tracking gives real transparency.",
+    rating: 5,
+    avatar: 'EC',
+  },
+  {
+    name: 'Michael Torres',
+    role: 'Weekend Golfer, San Diego',
+    content: "I love that I can choose which charities receive my contributions. The Pro plan analytics helped me drop my handicap by 3 strokes, and I feel good knowing every round makes a difference.",
+    rating: 5,
+    avatar: 'MT',
+  },
+  {
+    name: 'Lisa Park',
+    role: 'Corporate Events Manager',
+    content: "We used Golf4Good for our annual corporate charity tournament. The white-label options and custom reporting made it seamless. Our employees loved the competitive aspect and charitable tie-in.",
+    rating: 5,
+    avatar: 'LP',
+  },
+];
+
 async function main() {
   console.log('Seeding charities...');
   
@@ -51,6 +89,17 @@ async function main() {
       data: charity,
     });
     console.log(`Created charity: ${created.name}`);
+  }
+
+  console.log('Seeding testimonials...');
+  // Clear existing testimonials
+  await prisma.testimonial.deleteMany({});
+
+  for (const testimonial of testimonialsData) {
+    const created = await prisma.testimonial.create({
+      data: testimonial,
+    });
+    console.log(`Created testimonial: ${created.name}`);
   }
   
   console.log('Seeding complete.');
