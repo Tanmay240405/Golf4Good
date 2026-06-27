@@ -3,7 +3,8 @@ import {
   getCharities, 
   getCharityById, 
   createCharity, 
-  selectCharity 
+  selectCharity,
+  unsubscribeCharity
 } from '../controllers/charityController.js';
 import authenticate from '../middleware/auth.js';
 
@@ -24,5 +25,6 @@ router.post('/', authenticate, createCharity);
 
 // User route
 router.put('/select', authenticate, selectCharity);
+router.put('/unsubscribe', authenticate, unsubscribeCharity);
 
 export default router;

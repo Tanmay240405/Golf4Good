@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { Users, DollarSign, Trophy, Award, Activity, Flag, ShieldCheck } from 'lucide-react';
 import adminService from '../../services/adminService';
@@ -63,8 +64,8 @@ export default function AdminDashboard() {
         <p className="text-text-secondary">Welcome back to the command center.</p>
       </div>
 
-      {loading ? (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-bg-primary/95 backdrop-blur-xl">
+      {loading ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-bg-primary/95 backdrop-blur-xl">
            <motion.div
               animate={{ 
                 rotate: [0, 5, -5, 0],
@@ -98,7 +99,8 @@ export default function AdminDashboard() {
                ))}
              </div>
            </div>
-        </div>
+        </div>,
+        document.body
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

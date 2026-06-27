@@ -7,9 +7,9 @@ const prisma = new PrismaClient();
 const createCharitySchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().min(1, 'Description is required'),
-  logo: z.string().url('Invalid logo URL').optional(),
-  coverImage: z.string().url('Invalid cover image URL').optional(),
-  website: z.string().url('Invalid website URL').optional(),
+  logo: z.string().url('Invalid logo URL').optional().or(z.literal('')),
+  coverImage: z.string().url('Invalid cover image URL').optional().or(z.literal('')),
+  website: z.string().url('Invalid website URL').optional().or(z.literal('')),
   upcomingEvents: z.string().optional(),
 });
 
@@ -136,6 +136,19 @@ export const deleteCharity = async (req, res, next) => {
     const { id } = req.params;
     await prisma.charity.delete({ where: { id } });
     res.json({ success: true, message: 'Charity deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const unsubscribeCharity = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { selectedCharityId: null, donationPercentage: 10 }
+    });
+    res.json({ success: true, data: updatedUser });
   } catch (error) {
     next(error);
   }

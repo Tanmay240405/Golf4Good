@@ -119,11 +119,6 @@ export default function AdminCharities() {
                 ) : (
                   <ImageIcon className="w-12 h-12 text-white/10" />
                 )}
-                {charity.logo && (
-                  <div className="absolute bottom-4 left-4 w-16 h-16 rounded-xl overflow-hidden border-2 border-bg-primary bg-bg-secondary">
-                    <img src={charity.logo} alt="Logo" className="w-full h-full object-cover" />
-                  </div>
-                )}
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                    <button onClick={() => handleOpenModal(charity)} className="p-2 bg-black/50 backdrop-blur-md text-white rounded-lg hover:bg-accent hover:text-bg-primary transition-colors">
                      <Edit className="w-4 h-4" />
@@ -181,17 +176,13 @@ export default function AdminCharities() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-text-secondary mb-1">Logo URL</label>
-                    <input type="url" value={formData.logo} onChange={e => setFormData({...formData, logo: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-accent" />
+                    <label className="block text-sm font-semibold text-text-secondary mb-1">Cover Image URL</label>
+                    <input type="url" required value={formData.coverImage} onChange={e => setFormData({...formData, coverImage: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-accent" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-text-secondary mb-1">Cover Image URL</label>
-                    <input type="url" value={formData.coverImage} onChange={e => setFormData({...formData, coverImage: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-accent" />
+                    <label className="block text-sm font-semibold text-text-secondary mb-1">Website URL (Optional)</label>
+                    <input type="url" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-accent" />
                   </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-text-secondary mb-1">Website</label>
-                  <input type="url" value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-accent" />
                 </div>
                 <div className="pt-4 flex justify-end gap-3">
                   <button type="button" onClick={handleCloseModal} className="px-6 py-3 rounded-xl border border-white/10 text-white font-semibold hover:bg-white/5 transition-colors">Cancel</button>

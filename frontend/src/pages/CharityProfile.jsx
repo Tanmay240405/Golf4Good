@@ -10,8 +10,7 @@ import toast from 'react-hot-toast';
 export default function CharityProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, login } = useAuth(); // Need a way to update auth user context, assuming login or similar updates it, or we just rely on local state
-  // Actually, context 'user' should be updated. We might need to refresh user or update it locally.
+  const { user, updateUser } = useAuth();
   
   const [charity, setCharity] = useState(null);
   const [percentage, setPercentage] = useState(user?.donationPercentage || 10);
@@ -41,11 +40,26 @@ export default function CharityProfile() {
       const response = await charityService.selectCharity(id, parseInt(percentage));
       if (response.success) {
         toast.success('Donation settings updated!');
-        // Ideally update user context here, but reloading or navigation works too
-        setTimeout(() => navigate('/dashboard'), 1000);
+        updateUser(response.data);
       }
     } catch (error) {
       toast.error('Failed to save settings');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUnsubscribe = async () => {
+    if (!window.confirm('Are you sure you want to remove your support for this charity?')) return;
+    setIsSaving(true);
+    try {
+      const response = await charityService.unsubscribeCharity();
+      if (response.success) {
+        toast.success('Successfully removed support');
+        updateUser(response.data);
+      }
+    } catch (error) {
+      toast.error('Failed to remove support');
     } finally {
       setIsSaving(false);
     }
@@ -79,23 +93,14 @@ export default function CharityProfile() {
         <div className="h-64 md:h-80 relative">
           <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/60 to-transparent z-10" />
           <img 
-            src={charity.coverImage || `https://source.unsplash.com/random/1200x600/?charity,hope`} 
+            src={charity.coverImage || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?auto=format&fit=crop&q=80&w=1200&h=600'} 
             alt={charity.name}
             className="w-full h-full object-cover"
           />
         </div>
         
-        <div className="relative z-20 px-6 pb-8 md:px-10 -mt-20">
+        <div className="relative z-20 px-6 pb-8 md:px-10 -mt-16">
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-end mb-6">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-white p-3 shadow-2xl shrink-0">
-              {charity.logo ? (
-                <img src={charity.logo} alt="logo" className="w-full h-full object-contain" />
-              ) : (
-                <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center justify-center">
-                  <Heart className="w-10 h-10 text-gray-300" />
-                </div>
-              )}
-            </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-3xl md:text-5xl font-bold text-white">{charity.name}</h1>
@@ -152,11 +157,8 @@ export default function CharityProfile() {
                 max="100"
                 step="5"
                 value={percentage}
-                onChange={(e) => setPercentage(e.target.value)}
-                className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#f472b6]"
-                style={{
-                  background: `linear-gradient(to right, #f472b6 0%, #f472b6 ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`
-                }}
+                onChange={(e) => setPercentage(Number(e.target.value))}
+                className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#f472b6] hover:accent-[#db2777] transition-all"
               />
               <div className="flex justify-between mt-3 text-xs text-text-muted font-medium">
                 <span>10% (Min)</span>
@@ -177,6 +179,16 @@ export default function CharityProfile() {
               <>Save Support Settings <ArrowRight className="w-5 h-5" /></>
             )}
           </button>
+
+          {isCurrentSelection && (
+            <button 
+              onClick={handleUnsubscribe}
+              disabled={isSaving}
+              className="w-full mt-4 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-error/10 hover:text-error hover:border-error/30 transition-all disabled:opacity-50 flex justify-center items-center"
+            >
+              Remove Support
+            </button>
+          )}
         </motion.div>
 
         {/* Sidebar Info */}
@@ -186,20 +198,6 @@ export default function CharityProfile() {
           transition={{ delay: 0.2 }}
           className="flex flex-col gap-6"
         >
-          <div className="glass-card rounded-[2rem] p-6 border border-white/5 bg-[rgba(10,15,20,0.6)]">
-            <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-accent" />
-              Upcoming Events
-            </h3>
-            {charity.upcomingEvents ? (
-              <div className="text-text-secondary text-sm bg-white/5 p-4 rounded-xl border border-white/5">
-                {charity.upcomingEvents}
-              </div>
-            ) : (
-              <p className="text-text-muted text-sm italic">No upcoming events listed.</p>
-            )}
-          </div>
-          
           <div className="glass-card rounded-[2rem] p-6 border border-white/5 bg-[rgba(10,15,20,0.6)] text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#f472b6]/10 to-transparent pointer-events-none" />
             <p className="text-text-secondary text-sm mb-2 relative z-10">Total Raised on Golf4Good</p>

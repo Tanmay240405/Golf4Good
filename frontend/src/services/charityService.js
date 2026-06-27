@@ -22,5 +22,10 @@ export const charityService = {
   createCharity: async (charityData) => {
     const response = await api.post('/charities', charityData);
     return response.data;
+  },
+
+  unsubscribeCharity: async () => {
+    const response = await api.put('/charities/unsubscribe');
+    return response.data;
   }
 };
