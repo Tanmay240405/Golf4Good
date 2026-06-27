@@ -134,10 +134,35 @@ export default function AdminDashboard() {
                <h2 className="text-xl font-bold text-white mb-4">Recent Activity</h2>
                <div className="space-y-4">
                   <div className="p-4 bg-white/5 rounded-xl border border-white/5 text-sm">
-                    <span className="text-accent font-bold">Draw Completed</span> - The Monthly Mega Draw just finished with 12 winners.
+                    <div className="font-bold text-accent mb-1">Latest Completed Draw</div>
+                    {stats?.latestCompletedDraw ? (
+                      <div className="text-text-secondary">
+                        <span className="text-white">"{stats.latestCompletedDraw.title}"</span> completed on {new Date(stats.latestCompletedDraw.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        <div className="text-xs text-text-tertiary mt-1">
+                          Winning Numbers: {stats.latestCompletedDraw.winningNumbers.join(', ')}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-text-secondary">No draws completed yet.</div>
+                    )}
                   </div>
+
                   <div className="p-4 bg-white/5 rounded-xl border border-white/5 text-sm">
-                    <span className="text-success font-bold">New Subscription</span> - John Doe subscribed to Yearly Plan.
+                    <div className="font-bold text-purple-400 mb-1">Latest Winners</div>
+                    {stats?.winners && stats.winners.length > 0 ? (
+                      <div className="text-text-secondary">
+                        {stats.winners.join(', ')}
+                      </div>
+                    ) : (
+                      <div className="text-text-secondary">No winners in the latest draw.</div>
+                    )}
+                  </div>
+
+                  <div className="p-4 bg-white/5 rounded-xl border border-white/5 text-sm">
+                    <div className="font-bold text-success mb-1">New Subscriptions (Last 30 Days)</div>
+                    <div className="text-text-secondary">
+                      {stats?.newSubscribersLastMonth || 0} active subscriber{(stats?.newSubscribersLastMonth === 1) ? '' : 's'} added.
+                    </div>
                   </div>
                </div>
             </motion.div>

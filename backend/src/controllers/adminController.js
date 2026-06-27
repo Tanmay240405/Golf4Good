@@ -28,6 +28,38 @@ export const getDashboardStats = async (req, res, next) => {
       where: { status: 'PENDING' }
     });
 
+    // 1. The draw that has been completed
+    const latestCompletedDraw = await prisma.draw.findFirst({
+      where: { status: 'COMPLETED' },
+      orderBy: { date: 'desc' },
+      include: {
+        winners: {
+          include: {
+            user: {
+              select: { name: true }
+            }
+          }
+        }
+      }
+    });
+
+    // 2. Name of winners if any
+    const winners = latestCompletedDraw
+      ? latestCompletedDraw.winners.map(w => w.user.name)
+      : [];
+
+    // 3. No. of users that have subscribed in the last month (last 30 days)
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+    const newSubscribersLastMonth = await prisma.subscription.count({
+      where: {
+        status: 'ACTIVE',
+        createdAt: {
+          gte: oneMonthAgo
+        }
+      }
+    });
+
     return successResponse(res, {
       stats: {
         totalUsers,
@@ -35,7 +67,14 @@ export const getDashboardStats = async (req, res, next) => {
         monthlyRevenue,
         prizePool,
         totalDonations,
-        pendingWinners
+        pendingWinners,
+        latestCompletedDraw: latestCompletedDraw ? {
+          title: latestCompletedDraw.title,
+          date: latestCompletedDraw.date,
+          winningNumbers: latestCompletedDraw.winningNumbers
+        } : null,
+        winners,
+        newSubscribersLastMonth
       }
     });
   } catch (error) {
