@@ -7,8 +7,14 @@ import errorHandler from './middleware/errorHandler.js';
 const app = express();
 
 // ─── Middleware ──────────────────────────────────────────────
+const allowedOrigins = env.FRONTEND_URL === '*'
+  ? '*'
+  : env.FRONTEND_URL.split(',').map(s => s.trim());
+
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: allowedOrigins === '*'
+    ? true  // reflects the request origin back (works with credentials)
+    : allowedOrigins,
   credentials: true,
 }));
 
