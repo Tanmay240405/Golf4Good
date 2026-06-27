@@ -1,32 +1,21 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('g4g_token');
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  };
-};
+import api from '../lib/axios';
 
 export const getScores = async () => {
-  const response = await axios.get(`${API_URL}/scores`, getAuthHeaders());
+  const response = await api.get('/scores');
   return response.data;
 };
 
 export const addScore = async (data) => {
-  const response = await axios.post(`${API_URL}/scores`, data, getAuthHeaders());
+  const response = await api.post('/scores', data);
   return response.data;
 };
 
 export const updateScore = async (id, data) => {
-  const response = await axios.put(`${API_URL}/scores/${id}`, data, getAuthHeaders());
+  const response = await api.put(`/scores/${id}`, data);
   return response.data;
 };
 
 export const deleteScore = async (id) => {
-  const response = await axios.delete(`${API_URL}/scores/${id}`, getAuthHeaders());
+  const response = await api.delete(`/scores/${id}`);
   return response.data;
 };
