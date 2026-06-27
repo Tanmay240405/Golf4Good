@@ -209,7 +209,10 @@ const drawController = {
   async getPendingVerifications(req, res, next) {
     try {
       const pendingWinners = await prisma.drawWinner.findMany({
-        where: { proofImage: { not: null } },
+        where: { 
+          proofImage: { not: null },
+          status: { notIn: ['PAID', 'REJECTED'] }
+        },
         include: {
           user: { select: { name: true, email: true } },
           draw: { select: { date: true, winningNumbers: true } },
@@ -234,11 +237,29 @@ const drawController = {
         return errorResponse(res, 'Invalid status', 400);
       }
 
+      const winner = await prisma.drawWinner.findUnique({
+        where: { id },
+        include: { user: true },
+      });
+
+      if (!winner) {
+        return errorResponse(res, 'Winner not found', 404);
+      }
+
       const updatedWinner = await prisma.drawWinner.update({
         where: { id },
         data: { status },
         include: { user: { select: { name: true, email: true } } },
       });
+
+      // If status changed to PAID and the user has a charity, allocate funds
+      if (status === 'PAID' && winner.status !== 'PAID' && winner.user.selectedCharityId) {
+        const donationAmount = winner.prizeAmount * (winner.user.donationPercentage / 100);
+        await prisma.charity.update({
+          where: { id: winner.user.selectedCharityId },
+          data: { donationTotal: { increment: donationAmount } }
+        });
+      }
 
       return successResponse(res, { winner: updatedWinner }, 'Status updated successfully');
     } catch (error) {
