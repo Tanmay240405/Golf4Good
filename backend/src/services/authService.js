@@ -31,6 +31,8 @@ const authService = {
         name: true,
         email: true,
         avatar: true,
+        donationPercentage: true,
+        role: true,
         createdAt: true,
       },
     });
@@ -38,7 +40,7 @@ const authService = {
     // Generate token
     const token = generateToken(user.id);
 
-    return { user, token };
+    return { user: { ...user, totalWinnings: 0 }, token };
   },
 
   /**
@@ -67,10 +69,18 @@ const authService = {
     // Generate token
     const token = generateToken(user.id, remember);
 
-    // Return user without password
+    // Return user without password and with totalWinnings
+    const winnings = await prisma.drawWinner.findMany({
+      where: {
+        userId: user.id,
+        status: { in: ['APPROVED', 'PAID'] }
+      },
+      select: { prizeAmount: true }
+    });
+    const totalWinnings = winnings.reduce((sum, w) => sum + w.prizeAmount, 0);
     const { password: _, ...userWithoutPassword } = user;
 
-    return { user: userWithoutPassword, token };
+    return { user: { ...userWithoutPassword, totalWinnings }, token };
   },
 
   /**
@@ -113,6 +123,8 @@ const authService = {
         name: true,
         email: true,
         avatar: true,
+        donationPercentage: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -124,7 +136,17 @@ const authService = {
       throw error;
     }
 
-    return user;
+    // Calculate winnings
+    const winnings = await prisma.drawWinner.findMany({
+      where: {
+        userId,
+        status: { in: ['APPROVED', 'PAID'] }
+      },
+      select: { prizeAmount: true }
+    });
+    const totalWinnings = winnings.reduce((sum, w) => sum + w.prizeAmount, 0);
+
+    return { ...user, totalWinnings };
   },
 
   /**
@@ -157,12 +179,24 @@ const authService = {
         name: true,
         email: true,
         avatar: true,
+        donationPercentage: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    return user;
+    // Calculate winnings
+    const winnings = await prisma.drawWinner.findMany({
+      where: {
+        userId,
+        status: { in: ['APPROVED', 'PAID'] }
+      },
+      select: { prizeAmount: true }
+    });
+    const totalWinnings = winnings.reduce((sum, w) => sum + w.prizeAmount, 0);
+
+    return { ...user, totalWinnings };
   },
 };
 

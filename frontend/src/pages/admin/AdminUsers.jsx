@@ -58,17 +58,6 @@ export default function AdminUsers() {
           <h1 className="text-3xl font-bold text-white mb-2">Manage Users</h1>
           <p className="text-text-secondary">View, search, and manage platform users.</p>
         </div>
-        
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
-          <input 
-            type="text" 
-            placeholder="Search users..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-white focus:outline-none focus:border-accent transition-colors"
-          />
-        </div>
       </div>
 
       <div className="glass-card rounded-[2rem] border border-white/5 overflow-hidden">

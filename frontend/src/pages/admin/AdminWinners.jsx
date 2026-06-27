@@ -93,24 +93,41 @@ export default function AdminWinners() {
 
                 {/* Actions */}
                 <div className="flex flex-col gap-3 justify-center min-w-[160px] md:pl-8 md:border-l border-white/10 pt-6 md:pt-0 border-t md:border-t-0">
-                  <button
-                    onClick={() => handleStatusUpdate(winner.id, 'APPROVED')}
-                    className="w-full py-3 px-4 rounded-xl bg-success/10 text-success border border-success/30 hover:bg-success hover:text-white font-bold transition-all flex items-center justify-center gap-2"
-                  >
-                    <CheckCircle className="w-5 h-5" /> Approve
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(winner.id, 'PAID')}
-                    className="w-full py-3 px-4 rounded-xl bg-gold/10 text-gold border border-gold/30 hover:bg-gold hover:text-white font-bold transition-all flex items-center justify-center gap-2"
-                  >
-                    <DollarSign className="w-5 h-5" /> Mark Paid
-                  </button>
-                  <button
-                    onClick={() => handleStatusUpdate(winner.id, 'REJECTED')}
-                    className="w-full py-3 px-4 rounded-xl bg-error/10 text-error border border-error/30 hover:bg-error hover:text-white font-bold transition-all flex items-center justify-center gap-2"
-                  >
-                    <XCircle className="w-5 h-5" /> Reject
-                  </button>
+                  <div className="text-center mb-2">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
+                      winner.status === 'APPROVED' ? 'bg-success/20 text-success border-success/30' :
+                      winner.status === 'PENDING' ? 'bg-gold/20 text-gold border-gold/30' :
+                      'bg-white/10 text-white border-white/20'
+                    }`}>
+                      {winner.status}
+                    </span>
+                  </div>
+
+                  {winner.status === 'PENDING' && (
+                    <>
+                      <button
+                        onClick={() => handleStatusUpdate(winner.id, 'APPROVED')}
+                        className="w-full py-2.5 px-4 rounded-xl bg-success/10 text-success border border-success/30 hover:bg-success hover:text-white font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle className="w-5 h-5" /> Approve
+                      </button>
+                      <button
+                        onClick={() => handleStatusUpdate(winner.id, 'REJECTED')}
+                        className="w-full py-2.5 px-4 rounded-xl bg-error/10 text-error border border-error/30 hover:bg-error hover:text-white font-bold transition-all flex items-center justify-center gap-2"
+                      >
+                        <XCircle className="w-5 h-5" /> Reject
+                      </button>
+                    </>
+                  )}
+
+                  {winner.status === 'APPROVED' && (
+                    <button
+                      onClick={() => handleStatusUpdate(winner.id, 'PAID')}
+                      className="w-full py-2.5 px-4 rounded-xl bg-gold/10 text-gold border border-gold/30 hover:bg-gold hover:text-white font-bold transition-all flex items-center justify-center gap-2"
+                    >
+                      <DollarSign className="w-5 h-5" /> Mark Paid
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>

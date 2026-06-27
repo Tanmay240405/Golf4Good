@@ -21,7 +21,6 @@ const navItems = [
   { name: 'Draws', path: '/dashboard/draws', icon: Target },
   { name: 'Charity', path: '/dashboard/charity', icon: Heart },
   { name: 'Subscription', path: '/dashboard/subscription', icon: CreditCard },
-  { name: 'Profile', path: '/dashboard/profile', icon: User },
   { name: 'Settings', path: '/dashboard/settings', icon: Settings },
 ];
 

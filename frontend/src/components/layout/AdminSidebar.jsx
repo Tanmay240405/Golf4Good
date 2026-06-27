@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import authService from '../../services/authService';
+import { useAuth } from '../../contexts/AuthContext';
 
 const NAV_ITEMS = [
   { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
@@ -29,20 +29,22 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    authService.logout();
+    logout();
     navigate('/login');
   };
 
   return (
     <motion.aside
-      animate={{ width: collapsed ? 80 : 260 }}
-      className="h-screen sticky top-0 bg-bg-secondary border-r border-white/5 flex flex-col z-50 transition-all duration-300 shadow-2xl"
+      initial={false}
+      animate={{ width: collapsed ? (window.innerWidth < 768 ? 60 : 80) : (window.innerWidth < 768 ? '100%' : 260) }}
+      className={`h-screen shrink-0 sticky top-0 bg-bg-secondary border-r border-white/5 flex flex-col z-50 transition-all duration-300 shadow-2xl ${window.innerWidth < 768 && !collapsed ? 'absolute inset-0' : ''}`}
     >
-      <div className="p-6 flex items-center justify-between border-b border-white/5">
+      <div className="p-4 md:p-6 flex items-center justify-between border-b border-white/5">
         {!collapsed && (
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="w-8 h-8 rounded bg-gradient-to-tr from-accent to-gold flex items-center justify-center font-bold text-bg-primary">

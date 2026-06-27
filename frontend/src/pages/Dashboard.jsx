@@ -7,24 +7,30 @@ import { subscriptionService } from '../services/subscriptionService';
 import { drawService } from '../services/drawService';
 import { getScores } from '../services/scoreService';
 
-// Fallback/Mock scores to show a beautiful interactive HUD if the database is empty
-const defaultMockScores = [
-  { id: 'mock-1', score: 41, date: '2026-06-24', course: 'Pebble Beach Links', entries: 8 },
-  { id: 'mock-2', score: 36, date: '2026-06-20', course: 'St Andrews Old Course', entries: 5 },
-  { id: 'mock-3', score: 38, date: '2026-06-15', course: 'Augusta National', entries: 6 },
-];
-
 export default function Dashboard() {
   const { user } = useAuth();
   const [subscription, setSubscription] = useState(null);
-  const [scores, setScores] = useState(defaultMockScores);
+  const [scores, setScores] = useState([]);
   const [currentScoreIndex, setCurrentScoreIndex] = useState(0);
   const [upcomingDraw, setUpcomingDraw] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadSubscription();
-    loadScores();
-    loadUpcomingDraw();
+    const init = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          loadSubscription(),
+          loadScores(),
+          loadUpcomingDraw()
+        ]);
+      } catch (e) {
+        console.error("Failed to load dashboard data:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
   }, []);
 
   const loadUpcomingDraw = async () => {
@@ -59,41 +65,59 @@ export default function Dashboard() {
         const mapped = realScores.map((s) => ({
           id: s.id,
           score: s.score,
-          date: s.date ? s.date.split('T')[0] : '2026-06-24',
+          date: s.date ? s.date.split('T')[0] : '',
           course: s.course || 'Local Golf Club',
-          entries: s.entries || 10,
+          entries: s.entries || 0,
         }));
         setScores(mapped);
+      } else {
+        setScores([]);
       }
     } catch (e) {
-      console.error("Failed to load real scores, using premium mock scores.", e);
+      console.error("Failed to load real scores", e);
+      setScores([]);
     }
   };
 
   const nextScore = () => {
+    if (scores.length === 0) return;
     setCurrentScoreIndex((prev) => (prev + 1) % scores.length);
   };
 
   const prevScore = () => {
+    if (scores.length === 0) return;
     setCurrentScoreIndex((prev) => (prev - 1 + scores.length) % scores.length);
   };
 
   const isPro = subscription?.status === 'ACTIVE';
-  const currentScoreItem = scores[currentScoreIndex] || defaultMockScores[0];
+  const currentScoreItem = scores[currentScoreIndex] || { id: '', score: 0, date: '', course: '', entries: 0 };
 
   // Helper to format date into Day / Month
   const formatDateParts = (dateString) => {
     try {
+      if (!dateString) return { day: '--', month: '---' };
       const dateObj = new Date(dateString);
       const day = dateObj.getDate();
       const month = dateObj.toLocaleString('en-US', { month: 'short' });
       return { day, month };
     } catch (e) {
-      return { day: '24', month: 'Jun' };
+      return { day: '--', month: '---' };
     }
   };
 
   const { day, month } = formatDateParts(currentScoreItem.date);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] w-full">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-4 border-white/5" />
+          <div className="absolute inset-0 rounded-full border-4 border-accent border-t-transparent animate-spin" />
+        </div>
+        <p className="text-text-secondary text-sm font-semibold mt-4 animate-pulse">Loading dashboard details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-start justify-start w-full relative z-10 pb-16">
@@ -144,7 +168,7 @@ export default function Dashboard() {
 
           <div className="mb-6">
             <div className="text-[3.5rem] font-bold text-white leading-none tracking-tight">
-              $1,250
+              ${(user?.totalWinnings || 0).toLocaleString()}
             </div>
             <div className="text-text-secondary text-lg font-medium mt-1 flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-gold" /> Total Winnings
@@ -188,15 +212,30 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="flex items-end gap-3 mb-2">
-              <span className="text-5xl font-bold text-white drop-shadow-[0_0_15px_rgba(163,230,53,0.3)]">{Math.min(scores.length, 5)}</span>
-              <span className="text-text-secondary mb-1 font-medium">/ 5 max</span>
-            </div>
-            <p className="text-[15px] text-text-tertiary mb-6">Eligible for the upcoming draw</p>
+            {isPro ? (
+              <>
+                <div className="flex items-end gap-3 mb-2">
+                  <span className="text-5xl font-bold text-white drop-shadow-[0_0_15px_rgba(163,230,53,0.3)]">{Math.min(scores.length, 5)}</span>
+                  <span className="text-text-secondary mb-1 font-medium">/ 5 max</span>
+                </div>
+                <p className="text-[15px] text-text-tertiary mb-6">Eligible for the upcoming draw</p>
 
-            <Link to="/dashboard/scores" className="block text-center w-full py-2.5 bg-accent/10 border border-accent/20 hover:bg-accent hover:text-bg-primary text-accent rounded-xl font-semibold transition-all">
-              Manage Scores
-            </Link>
+                <Link to="/dashboard/scores" className="block text-center w-full py-2.5 bg-accent/10 border border-accent/20 hover:bg-accent hover:text-bg-primary text-accent rounded-xl font-semibold transition-all">
+                  Manage Scores
+                </Link>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-3">
+                  <Shield className="w-6 h-6 text-accent" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">Pro Feature</h3>
+                <p className="text-sm text-text-secondary mb-6">Subscribe to Pro to participate in our monthly prize draws and support charities.</p>
+                <Link to="/dashboard/subscription" className="block text-center w-full py-2.5 bg-accent hover:bg-accent-light text-bg-primary rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(163,230,53,0.3)]">
+                  Upgrade to Pro
+                </Link>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -206,13 +245,80 @@ export default function Dashboard() {
 
 
 
-        </div>
+        {/* Card 3: Upcoming Draw (Scrollable) */}
+        {isPro && upcomingDraw ? (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex md:hidden items-center select-none w-full"
+          >
+            <div 
+              className="relative flex items-center w-full max-w-[440px]"
+            >
+              {/* Floating Title Badge */}
+              <div className="absolute -top-3 left-6 bg-[#10161d] text-white text-[10px] px-3.5 py-1 rounded-full flex gap-1.5 font-semibold z-20 border border-gold/20">
+                <span className="text-gold font-bold drop-shadow-md">Upcoming Draw</span>
+              </div>
 
+              {/* Seamless Container (Pill) */}
+              <div className="flex items-center w-full h-20 justify-between bg-[#10161d] rounded-[2rem] px-6 relative overflow-hidden border border-gold/20 shadow-[0_10px_30px_rgba(234,179,8,0.15)] hover:shadow-[0_10px_35px_rgba(234,179,8,0.25)] transition-shadow">
+                
+                {/* Hexagon Honeycomb Overlay - Gold */}
+                <svg className="absolute inset-0 w-full h-full opacity-[0.15] text-gold" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <pattern id="hexagons-draw" width="12" height="20.78" patternUnits="userSpaceOnUse">
+                      <path d="M6 0 L12 3.46 L12 10.39 L6 13.86 L0 10.39 L0 3.46 Z" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                      <path d="M0 20.78 L6 17.32 L12 20.78" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#hexagons-draw)" />
+                </svg>
+
+                {/* Left Side (Countdown) */}
+                <div className="flex flex-col items-start justify-center z-10 pt-1">
+                  <span className="text-2xl font-bold text-white tracking-tight leading-none drop-shadow-md flex items-baseline">
+                    {Math.max(0, Math.ceil((new Date(upcomingDraw.date).getTime() - new Date().getTime()) / (1000 * 3600 * 24)))}<span className="text-sm text-gold mx-0.5">d</span>
+                  </span>
+                  <span className="text-[9px] uppercase text-gold tracking-[0.2em] font-black mt-1">
+                    Time Left
+                  </span>
+                </div>
+
+                {/* Right Side (Prize Pool) */}
+                <div className="flex items-center z-10 pt-1">
+                  <div className="flex flex-col items-end justify-center pr-5">
+                    <span className="text-[9px] uppercase text-text-muted tracking-widest font-extrabold mb-1">Prize Pool</span>
+                    <span className="text-xl font-bold text-white tracking-tight leading-none">${upcomingDraw.totalPrizePool.toLocaleString()}</span>
+                  </div>
+                  <div className="flex flex-col items-end justify-center border-l border-white/10 pl-5">
+                    <span className="text-[9px] uppercase text-gold tracking-widest font-extrabold mb-1 whitespace-nowrap">{upcomingDraw.title}</span>
+                    <span className="text-xs font-semibold text-text-secondary tracking-tight leading-none whitespace-nowrap">{new Date(upcomingDraw.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex md:hidden items-center select-none w-full"
+          >
+            <div className="bg-[#10161d] text-text-secondary text-sm px-6 py-4 rounded-[1.5rem] border border-white/5 flex items-center gap-3 shadow-xl backdrop-blur-md w-full max-w-[440px]">
+              <Ticket className="w-5 h-5 text-text-muted" /> No upcoming draws scheduled
+            </div>
+          </motion.div>
+        )}
+
+        </div>
       </div>
 
-      {/* Floating HUD - Upcoming Draw (Center Bottom) */}
-      {upcomingDraw ? (
-        <div className="fixed bottom-8 left-[35%] md:left-1/2 -translate-x-1/2 z-50 flex items-center select-none scale-90 md:scale-100 w-[320px]">
+      {/* Floating HUD - Upcoming Draw (Desktop Only) */}
+      {isPro && upcomingDraw ? (
+        <div className="hidden md:flex fixed bottom-8 left-1/2 -translate-x-1/2 z-50 items-center select-none scale-100 w-[320px] origin-center">
           {/* Unified Shape Wrapper */}
           <div 
             className="relative flex items-center w-full"
@@ -263,7 +369,7 @@ export default function Dashboard() {
           </div>
         </div>
       ) : (
-        <div className="fixed bottom-8 left-[35%] md:left-1/2 -translate-x-1/2 z-50 flex items-center select-none scale-90 md:scale-100">
+        <div className="hidden md:flex fixed bottom-8 left-1/2 -translate-x-1/2 z-50 items-center select-none scale-100 origin-center">
           <div className="bg-[#10161d] text-text-secondary text-xs px-4 py-2 rounded-full border border-white/5 flex items-center gap-2 shadow-xl backdrop-blur-md">
             <Ticket className="w-4 h-4 text-text-muted" /> No upcoming draws scheduled
           </div>
@@ -272,7 +378,7 @@ export default function Dashboard() {
 
       {/* Floating HUD - Latest Scores */}
       {scores.length > 0 && (
-        <div className="fixed bottom-8 right-8 z-50 flex items-center gap-3 select-none scale-90 md:scale-100 origin-bottom-right">
+        <div className="fixed bottom-4 md:bottom-8 left-1/2 md:left-auto md:right-8 -translate-x-1/2 md:translate-x-0 z-50 flex items-center gap-1 md:gap-3 select-none scale-[0.85] md:scale-100 origin-bottom md:origin-bottom-right w-max">
           {/* Prev Button */}
           <button
             onClick={prevScore}

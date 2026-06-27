@@ -21,9 +21,9 @@ export default function AdminDashboardLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-bg-primary font-sans text-text-primary overflow-hidden">
+    <div className="flex h-screen bg-bg-primary font-sans text-text-primary overflow-hidden w-full max-w-[100vw]">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto custom-scrollbar relative">
+      <main className="flex-1 h-full overflow-y-auto custom-scrollbar relative">
         {/* Golf Background with Overlay to match theme */}
         <div 
           className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none" 

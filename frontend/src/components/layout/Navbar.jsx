@@ -155,14 +155,7 @@ export default function Navbar() {
                           Admin Panel
                         </Link>
                       )}
-                      <Link
-                        to="/dashboard"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5 rounded-lg transition-colors"
-                      >
-                        <User className="w-4 h-4" />
-                        Profile
-                      </Link>
+
                       <button
                         onClick={() => { logout(); setProfileOpen(false); }}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors"

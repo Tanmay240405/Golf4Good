@@ -60,12 +60,12 @@ const plans = [
 // Configuration for each card's scroll animation timeline
 // Heavy overlap so they come fast and orbit together like planets
 const cardOrbitConfigs = [
-  // Card 1 animates between 0.10 and 0.60
-  { startScroll: 0.10, endScroll: 0.60 },
-  // Card 2 animates between 0.25 and 0.75
-  { startScroll: 0.25, endScroll: 0.75 },
-  // Card 3 animates between 0.40 and 0.90
-  { startScroll: 0.40, endScroll: 0.90 },
+  // Card 1 animates between 0.05 and 0.40
+  { startScroll: 0.05, endScroll: 0.40 },
+  // Card 2 animates between 0.32 and 0.67
+  { startScroll: 0.32, endScroll: 0.67 },
+  // Card 3 animates between 0.59 and 0.94
+  { startScroll: 0.59, endScroll: 0.94 },
 ];
 
 function OrbitingCard({ plan, index, scrollYProgress }) {
@@ -115,17 +115,17 @@ function OrbitingCard({ plan, index, scrollYProgress }) {
         We apply the counter-rotation here so the text stays upright.
       */}
       <motion.div
-        className="absolute pointer-events-auto w-[300px] xl:w-[340px]"
+        className="absolute pointer-events-auto w-[210px] sm:w-[260px] md:w-[300px] xl:w-[340px]"
         style={{
           // Orbit radius: hugging the ball tightly
-          x: 'calc(min(60vw, 600px) + 30px)',
+          x: 'calc(min(58vw, 600px) + 35px)',
           rotate: cardRotate,
           opacity: cardOpacity,
           scale: cardScale,
         }}
       >
         <div
-          className={`glass-card rounded-[2rem] p-7 backdrop-blur-3xl bg-[rgba(10,15,20,0.85)] border-2 transition-all duration-300 relative overflow-hidden group hover:scale-110 origin-center ${
+          className={`glass-card rounded-[1.25rem] md:rounded-[2rem] p-4 sm:p-5 md:p-7 backdrop-blur-3xl bg-[rgba(10,15,20,0.85)] border-2 transition-all duration-300 relative overflow-hidden group hover:scale-110 origin-center ${
             plan.popular
               ? 'border-accent/40 shadow-[0_0_40px_rgba(163,230,53,0.15)]'
               : 'border-white/5 hover:border-white/10'
@@ -158,25 +158,25 @@ function OrbitingCard({ plan, index, scrollYProgress }) {
             </div>
 
             <div className="flex items-baseline gap-1 mb-2">
-              <span className="text-4xl font-bold text-text-primary">
+              <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary">
                 {plan.price}
               </span>
-              <span className="text-text-tertiary text-sm">
+              <span className="text-text-tertiary text-[10px] md:text-sm">
                 {plan.period}
               </span>
             </div>
-            <p className="text-xs text-text-tertiary leading-relaxed">{plan.description}</p>
+            <p className="text-[10px] md:text-xs text-text-tertiary leading-relaxed">{plan.description}</p>
           </div>
 
-          <ul className="space-y-2.5 mb-6 relative z-10">
+          <ul className="space-y-1.5 md:space-y-2.5 mb-4 md:mb-6 relative z-10">
             {plan.features.map((feature) => (
-              <li key={feature} className="flex items-start gap-2.5">
+              <li key={feature} className="flex items-start gap-1.5 md:gap-2.5">
                 <Check
-                  className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${
+                  className={`w-3 h-3 md:w-3.5 md:h-3.5 mt-0.5 flex-shrink-0 ${
                     plan.popular ? 'text-accent' : 'text-text-muted'
                   }`}
                 />
-                <span className="text-sm text-text-secondary">
+                <span className="text-[10px] md:text-sm text-text-secondary">
                   {feature}
                 </span>
               </li>
@@ -185,7 +185,7 @@ function OrbitingCard({ plan, index, scrollYProgress }) {
 
           <Link to="/signup" className="relative z-10">
             <button
-              className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex justify-center items-center gap-2 ${
+              className={`w-full py-2 md:py-3 rounded-[0.85rem] md:rounded-xl font-semibold text-xs md:text-sm transition-all flex justify-center items-center gap-1.5 md:gap-2 ${
                 plan.popular
                   ? 'bg-gradient-to-r from-accent to-[#84cc16] text-bg-primary shadow-lg shadow-accent/20 hover:shadow-accent/40'
                   : 'bg-white/10 text-white hover:bg-white/15 border border-white/5'
@@ -220,11 +220,10 @@ export default function Pricing() {
   const titleY = useTransform(scrollYProgress, [0, 0.10], [40, 0]);
 
   return (
-    // Reduced height from 400vh to 250vh to make the entire sequence much faster and require less scrolling
     <section id="pricing" ref={containerRef} className="relative h-[250vh]">
       
-      {/* Sticky interior that stays pinned to the screen while scrolling the 250vh */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center">
+      {/* Sticky interior */}
+      <div className="flex sticky top-0 h-screen w-full overflow-hidden flex-col items-center justify-center">
         
         {/* Dark overlay to darken the background image like in hero section */}
         <div className="absolute inset-0 bg-[rgba(5,10,15,0.6)] pointer-events-none z-10" />
@@ -265,10 +264,6 @@ export default function Pricing() {
         </motion.div>
 
         {/* ===== ORBITING PRICING CARDS ===== */}
-        {/* 
-          This container serves as the center of the orbit (left: 0, top: 50%).
-          Cards will wrap around this point.
-        */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-40">
           {plans.map((plan, index) => (
             <OrbitingCard
@@ -279,7 +274,6 @@ export default function Pricing() {
             />
           ))}
         </div>
-        
       </div>
     </section>
   );

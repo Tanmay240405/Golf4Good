@@ -79,19 +79,20 @@ export default function AdminReports() {
            ) : reportData.length === 0 ? (
              <div className="flex-1 flex justify-center items-center text-text-muted">No data available</div>
            ) : (
-             <div className="flex-1 flex items-end gap-4 mt-10 px-4">
+             <div className="flex-1 flex items-end justify-around gap-4 mt-12 px-4 h-[250px]">
                {/* Simple custom bar chart representation for wow effect without complex libraries */}
                {reportData.map((item, index) => {
                  const maxUsers = Math.max(...reportData.map(d => d.users), 1);
-                 const heightPercent = (item.users / maxUsers) * 100;
+                 // Cap height to 90% so label fits above
+                 const heightPercent = Math.max((item.users / maxUsers) * 90, 5); 
                  return (
-                   <div key={index} className="flex-1 flex flex-col items-center gap-2 group">
-                     <div className="w-full relative bg-white/5 rounded-t-xl overflow-hidden" style={{ height: '250px' }}>
+                   <div key={index} className="flex-1 flex flex-col items-center justify-end h-full gap-2 group max-w-[100px]">
+                     <div className="w-full relative flex items-end justify-center h-full">
                        <div 
-                         className="absolute bottom-0 w-full bg-gradient-to-t from-accent to-gold rounded-t-xl opacity-80 group-hover:opacity-100 transition-all duration-500" 
+                         className="w-full bg-gradient-to-t from-accent to-gold rounded-t-xl opacity-80 group-hover:opacity-100 transition-all duration-500 relative flex justify-center" 
                          style={{ height: `${heightPercent}%` }}
                        >
-                         <div className="absolute -top-8 w-full text-center text-white font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                         <div className="absolute -top-8 text-center text-white font-bold text-sm bg-black/50 px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
                            {item.users}
                          </div>
                        </div>
