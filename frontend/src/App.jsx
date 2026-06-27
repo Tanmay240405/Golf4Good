@@ -67,7 +67,6 @@ export default function App() {
               <Route path="/dashboard/charity/:id" element={<CharityProfile />} />
               <Route path="/dashboard/subscription" element={<Subscription />} />
               <Route path="/dashboard/subscription/success" element={<SubscriptionSuccess />} />
-              <Route path="/dashboard/profile" element={<div className="p-8 text-white">Profile Placeholder</div>} />
               <Route path="/dashboard/settings" element={<div className="p-8 text-white">Settings Placeholder</div>} />
             </Route>
 

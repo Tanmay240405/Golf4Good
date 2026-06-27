@@ -36,6 +36,7 @@ import drawRoutes from './routes/drawRoutes.js';
 
 import adminRoutes from './routes/adminRoutes.js';
 import testimonialRoutes from './routes/testimonialRoutes.js';
+import statsRoutes from './routes/statsRoutes.js';
 
 // ─── Routes ─────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
@@ -45,6 +46,7 @@ app.use('/api/charities', charityRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/draws', drawRoutes);
 app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/stats', statsRoutes);
 
 // ─── 404 Handler ────────────────────────────────────────────
 app.use((_req, res) => {

@@ -12,6 +12,7 @@ export default function Draws() {
   const [selectedWinning, setSelectedWinning] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [subscription, setSubscription] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -20,14 +21,18 @@ export default function Draws() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [winningsRes, historyRes, upcomingRes] = await Promise.all([
+      const [winningsRes, historyRes, upcomingRes, subRes] = await Promise.all([
         drawService.getMyWinnings(),
         drawService.getDrawHistory(),
-        drawService.getUpcomingDraws()
+        drawService.getUpcomingDraws(),
+        import('../services/subscriptionService').then(m => m.subscriptionService.getCurrentSubscription().catch(() => null))
       ]);
       setWinnings(winningsRes.winnings || []);
       setHistory(historyRes.draws || []);
       setUpcomingDraws(upcomingRes.draws || []);
+      if (subRes && subRes.success) {
+        setSubscription(subRes.data);
+      }
     } catch (error) {
       toast.error('Failed to load draws data');
       console.error(error);
@@ -35,6 +40,8 @@ export default function Draws() {
       setLoading(false);
     }
   };
+
+  const isPro = subscription?.status === 'ACTIVE';
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -96,6 +103,19 @@ export default function Draws() {
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : !isPro ? (
+        <div className="flex flex-col items-center justify-center h-96 glass-card rounded-[2rem] border border-white/5 text-center p-8">
+          <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-6">
+            <Trophy className="w-8 h-8 text-accent" />
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-4">Pro Feature</h2>
+          <p className="text-lg text-text-secondary mb-8 max-w-md">
+            Subscribe to Pro to participate in our monthly prize draws and support charities with your golf scores.
+          </p>
+          <a href="/dashboard/subscription" className="px-8 py-3 rounded-xl bg-accent hover:bg-accent-light text-bg-primary font-bold text-lg transition-all shadow-[0_0_20px_rgba(163,230,53,0.3)] hover:scale-105 active:scale-95">
+            Upgrade to Pro
+          </a>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

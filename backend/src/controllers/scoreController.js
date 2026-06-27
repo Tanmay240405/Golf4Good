@@ -5,7 +5,7 @@ const scoreSchema = z.object({
   score: z.number().int().min(1).max(45),
   date: z.string().datetime({ message: "Invalid datetime string" }),
   course: z.string().min(1, 'Course name is required'),
-  entries: z.number().int().min(0, 'Entries cannot be negative')
+  entries: z.number().int().min(0, 'Entries cannot be negative').optional().default(1)
 });
 
 // @desc    Get user scores
